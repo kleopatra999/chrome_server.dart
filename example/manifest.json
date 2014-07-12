@@ -1,0 +1,19 @@
+{
+	"manifest_version": 2,
+	"name": "simple_chrome_server",
+	"version": "0.1",
+	"app": {
+		"background": {
+			"scripts":["background_dev.js"]
+		}
+	},
+	"permissions":["webview"],
+	"sockets": {
+			"tcp":{
+				"connect":"127.0.0.1:*"	
+			},
+	    "tcpServer": {
+	      "listen": "127.0.0.1:*"
+	    }
+  	}
+}

@@ -1,0 +1,6 @@
+packages
+example/packages
+example/simple/packages
+pubspec.lock
+*.sublime-project
+*.sublime-workspace
