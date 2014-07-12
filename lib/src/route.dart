@@ -2,9 +2,9 @@ part of chrome_server;
 
 class Request {
 
-	List _headerLines;
+  List _headerLines;
 
-	/**
+  /**
 	* Builds [Request] from ArrayBuffer header information.
 	* 
 	* Example: 
@@ -24,21 +24,20 @@ class Request {
 	* 
 	* 	var header = new chrome.ArrayBuffer.fromString(headerStr);
 	* 
-	**/ 
+	**/
 
-	Request.from(chrome.ArrayBuffer header) {
-		this._headerLines = new String.fromCharCodes(header.getBytes()).split('\n');
-	}
+  Request.from(chrome.ArrayBuffer header) {
+    this._headerLines = new String.fromCharCodes(header.getBytes()).split('\n');
+  }
 
-	String _methodRoutePart() {
-		return _headerLines
-		.firstWhere((element) { 
-			// Only GET requests supported currently
-			return element.contains("GET");
-		}).trim();
-	}
+  String _methodRoutePart() {
+    return _headerLines.firstWhere((element) {
+      // Only GET requests supported currently
+      return element.contains("GET");
+    }).trim();
+  }
 
-	/**
+  /**
 	* [Uri] of [Request].
 	* 
 	* Example:
@@ -48,14 +47,14 @@ class Request {
 	* requestUri : /index.html?foo=bar&foo2=bar2
 	**/
 
-	Uri get requestUri  => _requestUri();
+  Uri get requestUri => _requestUri();
 
-	Uri _requestUri() {
-		String uriPart = _methodRoutePart().split(' ')[1];
-		return Uri.parse(uriPart);
-	}
+  Uri _requestUri() {
+    String uriPart = _methodRoutePart().split(' ')[1];
+    return Uri.parse(uriPart);
+  }
 
-	/**
+  /**
 	* Query parameters of request [Uri].
 	* 
 	* Example:
@@ -67,9 +66,9 @@ class Request {
 	* 	foo2 : bar2
 	**/
 
-	Map get query  => requestUri.queryParameters;
+  Map get query => requestUri.queryParameters;
 
-	/**
+  /**
 	* Path of request [Uri].
 	* 
 	* Example:
@@ -79,32 +78,30 @@ class Request {
 	* path : /index.html
 	**/
 
-	String get path  => requestUri.path;
+  String get path => requestUri.path;
 
-	/**
+  /**
 	* [Map] of request headers parsed from ArrayBuffer.
 	**/
 
-	Map get headers  => _parseHeaders();
+  Map get headers => _parseHeaders();
 
-	Map _parseHeaders() {
-		var hm = {};
-		var exp = new RegExp(r"(\w+(-\w+)?):");
-		_headerLines
-		.where((element) => element.trim().startsWith(exp))
-		.toList()
-		.forEach((element){
-			element = element.trim();
-			Match match = exp.firstMatch(element);
-			String headerKey = match.group(1);
-			String headerValue = element.substring(match.end).trim();
-			hm[headerKey] = headerValue;
-		});
+  Map _parseHeaders() {
+    var hm = {};
+    var exp = new RegExp(r"(\w+(-\w+)?):");
+    _headerLines.where((element) => element.trim().startsWith(exp)).toList(
+        ).forEach((element) {
+      element = element.trim();
+      Match match = exp.firstMatch(element);
+      String headerKey = match.group(1);
+      String headerValue = element.substring(match.end).trim();
+      hm[headerKey] = headerValue;
+    });
 
-		return hm;
-	}
+    return hm;
+  }
 
-	/**
+  /**
 	* Host of parsed request headers.
 	* 
 	* Example:
@@ -113,9 +110,9 @@ class Request {
   * 
   * host == "localhost:8080"; // true
 	**/
-	String get host  => headers["Host"];
+  String get host => headers["Host"];
 
-	/**
+  /**
 	* Request method parsed from request headers.
 	* 
 	* Example:
@@ -123,31 +120,31 @@ class Request {
 	*	
 	* method == "GET"; // true
 	**/
-	String get method  => _methodRoutePart().split(' ')[0];
+  String get method => _methodRoutePart().split(' ')[0];
 
-	/**
+  /**
 	* Connection keep-alive header parsed from header request.
 	**/
-	bool get keepAlive  => headers["Connection"] == "keep-alive";
+  bool get keepAlive => headers["Connection"] == "keep-alive";
 
-	/**
+  /**
 	* Mime-type parsed from request [Uri] path.
 	**/
-	String get mimeType => _mimeType();
+  String get mimeType => _mimeType();
 
-	String _mimeType() {
-		var mtr = new MimeTypeResolver();
-		return mtr.lookup(path);
-	}	
+  String _mimeType() {
+    var mtr = new MimeTypeResolver();
+    return mtr.lookup(path);
+  }
 
 }
 
 class Response {
-	
-	final _headerCompleter = new Completer();
-	final _bodyCompleter = new Completer();
 
-	/**
+  final _headerCompleter = new Completer();
+  final _bodyCompleter = new Completer();
+
+  /**
 	* The header component of the response.
 	* 
 	* Requires setting [request].
@@ -155,71 +152,71 @@ class Response {
 	* returns Future<ArrayBuffer> where ArrayBuffer is from the [chrome](https://pub.dartlang.org/packages/chrome) library.
 	**/
 
-	Future<chrome.ArrayBuffer> get header => _headerCompleter.future;
+  Future<chrome.ArrayBuffer> get header => _headerCompleter.future;
 
-	/**
+  /**
 	* The body component of the response.
 	* 
 	* Requires setting [request].
 	* 
 	* returns Future<ArrayBuffer> where ArrayBuffer is from the [chrome](https://pub.dartlang.org/packages/chrome) library.
 	**/
-	Future<chrome.ArrayBuffer> get body => _bodyCompleter.future;
+  Future<chrome.ArrayBuffer> get body => _bodyCompleter.future;
 
-	/**
+  /**
 	* Sets the [Request].
 	**/
-	void set request (value) => _setRequest(value);
+  void set request(value) => _setRequest(value);
 
-	void _setRequest(Request request) {
+  void _setRequest(Request request) {
 
-		var httpRequest = new HttpRequest();
-		httpRequest.open('GET', '${request.path}', async:true);
-		httpRequest.responseType = 'arraybuffer';
-		var contentType = request.mimeType;
+    var httpRequest = new HttpRequest();
+    httpRequest.open('GET', '${request.path}', async: true);
+    httpRequest.responseType = 'arraybuffer';
+    var contentType = request.mimeType;
 
-		httpRequest.onLoadEnd.listen((event){
+    httpRequest.onLoadEnd.listen((event) {
 
-			if(httpRequest.status==200) {
+      if (httpRequest.status == 200) {
 
-				Uint8List content = httpRequest.response;
-				List<int> byteList = content.toList();
+        Uint8List content = httpRequest.response;
+        List<int> byteList = content.toList();
 
-				var contentLength = content.length;
-				var hsb = new StringBuffer();
-				hsb.write("HTTP/1.0 200 OK\n");
-				hsb.write("Content-length: $contentLength\n");
-				hsb.write("Content-type: $contentType\n");
-				hsb.write("\n\n");
-				var header = hsb.toString();
-				
-				var headerBuffer = new chrome.ArrayBuffer.fromString(header);
-				_headerCompleter.complete(headerBuffer);
+        var contentLength = content.length;
+        var hsb = new StringBuffer();
+        hsb.write("HTTP/1.0 200 OK\n");
+        hsb.write("Content-length: $contentLength\n");
+        hsb.write("Content-type: $contentType\n");
+        hsb.write("\n\n");
+        var header = hsb.toString();
 
-				var bodyBuffer = new chrome.ArrayBuffer.fromBytes(byteList);
-				_bodyCompleter.complete(bodyBuffer);
+        var headerBuffer = new chrome.ArrayBuffer.fromString(header);
+        _headerCompleter.complete(headerBuffer);
 
-			} else {
-				
-				var errorContent = "<html><div>Not Found</div></html>";
-				var contentLength = errorContent.length;
-				var contentType = "text/html";
+        var bodyBuffer = new chrome.ArrayBuffer.fromBytes(byteList);
+        _bodyCompleter.complete(bodyBuffer);
 
-				var hsb = new StringBuffer();
-				hsb.write("HTTP/1.0 404 Not Found\n");
-				hsb.write("Content-length: $contentLength\n");
-				hsb.write("Content-type: $contentType\n");
-				hsb.write("\n\n");
-				var header = hsb.toString();
-				var headerBuffer = new chrome.ArrayBuffer.fromString(header);
-				_headerCompleter.complete(headerBuffer);
+      } else {
 
-				var bodyBuffer = new chrome.ArrayBuffer.fromString(errorContent);
-				_bodyCompleter.complete(bodyBuffer);
-			}
-		});	
+        var errorContent = "<html><div>Not Found</div></html>";
+        var contentLength = errorContent.length;
+        var contentType = "text/html";
 
-		httpRequest.send();	
-	}
+        var hsb = new StringBuffer();
+        hsb.write("HTTP/1.0 404 Not Found\n");
+        hsb.write("Content-length: $contentLength\n");
+        hsb.write("Content-type: $contentType\n");
+        hsb.write("\n\n");
+        var header = hsb.toString();
+        var headerBuffer = new chrome.ArrayBuffer.fromString(header);
+        _headerCompleter.complete(headerBuffer);
+
+        var bodyBuffer = new chrome.ArrayBuffer.fromString(errorContent);
+        _bodyCompleter.complete(bodyBuffer);
+      }
+    });
+
+    httpRequest.send();
+  }
 
 }

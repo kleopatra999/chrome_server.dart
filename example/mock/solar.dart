@@ -56,36 +56,40 @@ class SolarSystem {
 
     // Create sun.
     final mercury = new PlanetaryBody(this, "orange", 0.382, 0.387, 0.241);
-    final venus   = new PlanetaryBody(this, "green", 0.949, 0.723, 0.615);
+    final venus = new PlanetaryBody(this, "green", 0.949, 0.723, 0.615);
     final earth = new PlanetaryBody(this, "#33f", 1.0, 1.0, 1.0);
-    final moon  = new PlanetaryBody(this, "gray", 0.2, 0.14, 0.075);
+    final moon = new PlanetaryBody(this, "gray", 0.2, 0.14, 0.075);
     earth.addPlanet(moon);
 
-    final mars  = new PlanetaryBody(this, "red", 0.532, 1.524, 1.88);
+    final mars = new PlanetaryBody(this, "red", 0.532, 1.524, 1.88);
 
     final f = 0.1;
     final h = 1 / 1500.0;
     final g = 1 / 72.0;
 
-    final jupiter  = new PlanetaryBody(this, "gray", 4.0, 5.203, 11.86);
-    final io       = new PlanetaryBody(this, "gray", 3.6*f, 421*h, 1.769*g);
-    final europa   = new PlanetaryBody(this, "gray", 3.1*f, 671*h, 3.551*g);
-    final ganymede = new PlanetaryBody(this, "gray", 5.3*f, 1070*h, 7.154*g);
-    final callisto = new PlanetaryBody(this, "gray", 4.8*f, 1882*h, 16.689*g);
-    jupiter..addPlanet(io)
-           ..addPlanet(europa)
-           ..addPlanet(ganymede)
-           ..addPlanet(callisto);
+    final jupiter = new PlanetaryBody(this, "gray", 4.0, 5.203, 11.86);
+    final io = new PlanetaryBody(this, "gray", 3.6 * f, 421 * h, 1.769 * g);
+    final europa = new PlanetaryBody(this, "gray", 3.1 * f, 671 * h, 3.551 * g);
+    final ganymede = new PlanetaryBody(this, "gray", 5.3 * f, 1070 * h, 7.154 *
+        g);
+    final callisto = new PlanetaryBody(this, "gray", 4.8 * f, 1882 * h, 16.689 *
+        g);
+    jupiter
+        ..addPlanet(io)
+        ..addPlanet(europa)
+        ..addPlanet(ganymede)
+        ..addPlanet(callisto);
 
-    sun = new PlanetaryBody(this, "#ff2", 14.0)..addPlanet(mercury)
-                                               ..addPlanet(venus)
-                                               ..addPlanet(earth)
-                                               ..addPlanet(mars)
-                                               ..addPlanet(jupiter);
+    sun = new PlanetaryBody(this, "#ff2", 14.0)
+        ..addPlanet(mercury)
+        ..addPlanet(venus)
+        ..addPlanet(earth)
+        ..addPlanet(mars)
+        ..addPlanet(jupiter);
 
     addAsteroidBelt(sun, 150);
 
-   requestRedraw();
+    requestRedraw();
   }
 
   void draw(num _) {
@@ -117,9 +121,8 @@ class SolarSystem {
     // Asteroids are generally between 2.06 and 3.27 AUs.
     for (int i = 0; i < count; i++) {
       var radius = 2.06 + random.nextDouble() * (3.27 - 2.06);
-      body.addPlanet(
-          new PlanetaryBody(this, "#777",
-              0.1 * random.nextDouble(), radius, radius * 2));
+      body.addPlanet(new PlanetaryBody(this, "#777", 0.1 * random.nextDouble(),
+          radius, radius * 2));
     }
   }
 
@@ -144,8 +147,8 @@ class PlanetaryBody {
 
   final List<PlanetaryBody> planets = <PlanetaryBody>[];
 
-  PlanetaryBody(this.solarSystem, this.color, this.bodySize,
-      [this.orbitRadius = 0.0, this.orbitPeriod = 0.0]) {
+  PlanetaryBody(this.solarSystem, this.color, this.bodySize, [this.orbitRadius =
+      0.0, this.orbitPeriod = 0.0]) {
     bodySize = solarSystem.normalizePlanetSize(bodySize);
     orbitRadius = solarSystem.normalizeOrbitRadius(orbitRadius);
     orbitSpeed = calculateSpeed(orbitPeriod);
@@ -167,44 +170,49 @@ class PlanetaryBody {
     if (p.y + bodySize < 0 || p.y - bodySize >= context.canvas.height) return;
 
     // Draw the figure.
-    context..lineWidth = 0.5
-           ..fillStyle = color
-           ..strokeStyle = color;
+    context
+        ..lineWidth = 0.5
+        ..fillStyle = color
+        ..strokeStyle = color;
 
     if (bodySize >= 2.0) {
-      context..shadowOffsetX = 2
-             ..shadowOffsetY = 2
-             ..shadowBlur = 2
-             ..shadowColor = "#ddd";
+      context
+          ..shadowOffsetX = 2
+          ..shadowOffsetY = 2
+          ..shadowBlur = 2
+          ..shadowColor = "#ddd";
     }
 
-    context..beginPath()
-           ..arc(p.x, p.y, bodySize, 0, PI * 2, false)
-           ..fill()
-           ..closePath();
+    context
+        ..beginPath()
+        ..arc(p.x, p.y, bodySize, 0, PI * 2, false)
+        ..fill()
+        ..closePath();
 
-    context..shadowOffsetX = 0
-           ..shadowOffsetY = 0
-           ..shadowBlur = 0;
+    context
+        ..shadowOffsetX = 0
+        ..shadowOffsetY = 0
+        ..shadowBlur = 0;
 
-    context..beginPath()
-           ..arc(p.x, p.y, bodySize, 0, PI * 2, false)
-           ..fill()
-           ..closePath()
-           ..stroke();
+    context
+        ..beginPath()
+        ..arc(p.x, p.y, bodySize, 0, PI * 2, false)
+        ..fill()
+        ..closePath()
+        ..stroke();
   }
 
   void drawChildren(CanvasRenderingContext2D context, Point p) {
     for (var planet in planets) planet.draw(context, p);
   }
 
-  num calculateSpeed(num period) =>
-    period == 0.0 ? 0.0 : 1 / (60.0 * 24.0 * 2 * period);
+  num calculateSpeed(num period) => period == 0.0 ? 0.0 : 1 / (60.0 * 24.0 * 2 *
+      period);
 
   Point calculatePos(Point p) {
     if (orbitSpeed == 0.0) return p;
     num angle = solarSystem.renderTime * orbitSpeed;
-    return new Point(orbitRadius * cos(angle) + p.x,
-                     orbitRadius * sin(angle) + p.y);
+    return new Point(orbitRadius * cos(angle) + p.x, orbitRadius * sin(angle) +
+        p.y);
   }
 }

@@ -6,11 +6,11 @@ import 'dart:async';
 
 
 void main() {
-	var tcpServer = new TcpServer(addr:"127.0.0.1", port:8080);
-	tcpServer.listen().then((int port) { 
-		print("Listening on port $port");
-		chrome.app.window.create('/index.html?port=$port').then((_) => _);
-	});
+  var tcpServer = new TcpServer(addr: "127.0.0.1", port: 8080);
+  tcpServer.listen().then((int port) {
+    print("Listening on port $port");
+    chrome.app.window.create('/index.html?port=$port').then((_) => _);
+  });
 }
 
 
